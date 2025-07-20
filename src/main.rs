@@ -116,10 +116,8 @@ fn normalize(prog : &Prog) -> Result<Prog, String> {
 
 
 fn main() {
-    println!("=== Test de normalize avec if 1+(2+3) < 4 then false else 5 ===");
-    
-    // Construction de l'expression: if 1+(2+3) < 4 then false else 5
-    let complex_prog = Prog::If(
+    //if 1+(2+3) < 4 then 6 else 5
+    let test = Prog::If(
         Box::new(Prog::Lt(
             Box::new(Prog::Add(
                 Box::new(Prog::Int(1)),
@@ -131,45 +129,10 @@ fn main() {
         Box::new(Prog::Int(5))
     );
     
-    println!("Expression: if 1+(2+3) < 4 then false else 5");
-    println!("Programme: {:?}", complex_prog);
+    println!("\nTypable: {}", typable(&test));
     
-    // Test de typabilité
-    println!("\nTypable: {}", typable(&complex_prog));
+    let normalized = normalize(&test);
+    println!("{:?}", normalized);
     
-    // Test de reduce étape par étape
-    println!("\n=== Tests de reduce étape par étape ===");
-    let mut current = complex_prog.clone();
-    let mut step = 1;
-    
-    loop {
-        match reduce(&current) {
-            Some(reduced) => {
-                println!("Étape {}: {:?}", step, reduced);
-                current = reduced;
-                step += 1;
-                if step > 10 { // Protection contre les boucles infinies
-                    println!("Arrêt après 10 étapes pour éviter une boucle infinie");
-                    break;
-                }
-            },
-            None => {
-                println!("Aucune réduction possible à l'étape {}", step);
-                break;
-            }
-        }
-    }
-    
-    // Test avec normalize
-    println!("\n=== Test avec normalize ===");
-    let normalized = normalize(&complex_prog);
-    println!("Résultat final: {:?}", normalized);
-    
-    // Analyse attendue
-    println!("\n=== Analyse attendue ===");
-    println!("1. 2+3 = 5");
-    println!("2. 1+5 = 6");
-    println!("3. 6 < 4 = false");
-    println!("4. if false then false else 5 = 5");
-    println!("Résultat attendu: Int(5)");
+
 }
